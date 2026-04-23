@@ -1,0 +1,1287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Case Files · Porpavai</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300&family=Archivo:wght@300;400&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --wine:       #4E0C28;
+      --periwinkle: #C4D2F7;
+      --peri-dim:   rgba(196,210,247,0.55);
+      --peri-faint: rgba(196,210,247,0.12);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: #05010a;
+      color: var(--periwinkle);
+      font-family: 'Archivo', sans-serif;
+      font-weight: 300;
+      overflow-x: hidden;
+    }
+
+    /* ── GALAXY CANVAS ── */
+    #galaxy {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    /* ── SITE WRAPPER ── */
+    .site { position: relative; z-index: 1; }
+
+    /* ── HEADER ── */
+    header {
+      background: var(--wine);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      display: flex;
+      align-items: stretch;
+      justify-content: space-between;
+      padding: 0 4rem;
+      border-bottom: 1px solid rgba(196,210,247,0.1);
+    }
+
+    .header-name {
+      display: flex;
+      align-items: center;
+      gap: 0.7rem;
+      padding: 1.3rem 0;
+      text-decoration: none;
+    }
+
+    .header-name h1 {
+      font-family: 'Cormorant Garamond', serif;
+      font-weight: 300;
+      font-size: 1.5rem;
+      color: var(--periwinkle);
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+    }
+
+    .star-glyph { opacity: 0.45; font-size: 0.9rem; color: var(--periwinkle); }
+
+    nav { display: flex; align-items: center; }
+
+    nav a {
+      color: var(--periwinkle);
+      text-decoration: none;
+      font-size: 0.68rem;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      font-weight: 400;
+      padding: 0 1.6rem;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      border-left: 1px solid rgba(196,210,247,0.1);
+      position: relative;
+      transition: color 0.2s;
+    }
+
+    nav a::after {
+      content: '';
+      position: absolute;
+      bottom: 0; left: 0;
+      width: 0; height: 2px;
+      background: var(--periwinkle);
+      transition: width 0.3s ease;
+    }
+
+    nav a:hover::after { width: 100%; }
+    nav a:hover { color: #fff; }
+    nav a.active::after { width: 100%; }
+
+    /* ── GRID SYSTEM ── */
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(12, 1fr);
+      gap: 12px;
+      background: transparent;
+      margin: 3rem;
+    }
+
+    .block {
+      padding: 3rem;
+      backdrop-filter: blur(18px) saturate(1.3);
+      -webkit-backdrop-filter: blur(18px) saturate(1.3);
+      border-radius: 16px;
+      overflow: hidden;
+    }
+
+    .block-blue { background: rgba(196,210,247,0.11); }
+    .block-wine { background: rgba(78,12,40,0.70); }
+    .block-dark { background: rgba(5,1,10,0.52); }
+
+    .col-3  { grid-column: span 3; }
+    .col-4  { grid-column: span 4; }
+    .col-5  { grid-column: span 5; }
+    .col-6  { grid-column: span 6; }
+    .col-7  { grid-column: span 7; }
+    .col-8  { grid-column: span 8; }
+    .col-9  { grid-column: span 9; }
+    .col-12 { grid-column: span 12; }
+
+    /* ── BLOCK LABEL ── */
+    .block-label {
+      font-size: 0.6rem;
+      letter-spacing: 0.35em;
+      text-transform: uppercase;
+      color: rgba(196,210,247,0.35);
+      margin-bottom: 1.5rem;
+      display: block;
+    }
+
+    /* ── PAGE HERO ── */
+    .page-hero {
+      min-height: 34vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+    }
+
+    .page-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(3rem, 6vw, 5.5rem);
+      font-weight: 300;
+      line-height: 1.0;
+      color: var(--periwinkle);
+    }
+
+    .page-title em { font-style: italic; color: rgba(196,210,247,0.45); }
+
+    .page-subtitle {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(1rem, 1.6vw, 1.2rem);
+      font-weight: 300;
+      color: var(--peri-dim);
+      margin-top: 1.2rem;
+      line-height: 1.7;
+      max-width: 38ch;
+    }
+
+    /* ── STAT BLOCK ── */
+    .stat-block {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 2rem;
+    }
+
+    .stat-item { display: flex; flex-direction: column; gap: 0.35rem; }
+    .stat-number {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(2.8rem, 4vw, 4rem);
+      font-weight: 300;
+      color: var(--periwinkle);
+      line-height: 1;
+    }
+    .stat-label {
+      font-size: 0.58rem;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: rgba(196,210,247,0.3);
+    }
+
+    /* ── CASE CARD ── */
+    .case-card {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 2rem;
+      min-height: 28vh;
+      cursor: pointer;
+      transition: background 0.3s ease, transform 0.25s ease;
+      text-decoration: none;
+      color: inherit;
+    }
+
+    .case-card:hover {
+      background: rgba(196,210,247,0.17);
+      transform: translateY(-3px);
+    }
+
+    .case-card.block-wine:hover {
+      background: rgba(78,12,40,0.88);
+      transform: translateY(-3px);
+    }
+
+    .case-top { display: flex; flex-direction: column; gap: 0.8rem; }
+
+    .case-number {
+      font-size: 0.58rem;
+      letter-spacing: 0.35em;
+      text-transform: uppercase;
+      color: rgba(196,210,247,0.28);
+    }
+
+    .case-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(1.4rem, 2.2vw, 2rem);
+      font-weight: 300;
+      line-height: 1.2;
+      color: var(--periwinkle);
+    }
+
+    .case-desc {
+      font-size: 0.82rem;
+      line-height: 1.75;
+      color: var(--peri-dim);
+    }
+
+    .case-bottom {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .case-tags { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+
+    .tag {
+      font-size: 0.55rem;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: rgba(196,210,247,0.38);
+      border: 1px solid rgba(196,210,247,0.15);
+      border-radius: 100px;
+      padding: 0.3rem 0.75rem;
+    }
+
+    .case-arrow {
+      font-size: 1.1rem;
+      color: rgba(196,210,247,0.3);
+      transition: transform 0.25s ease, color 0.25s ease;
+    }
+
+    .case-card:hover .case-arrow {
+      transform: translate(4px, -4px);
+      color: var(--periwinkle);
+    }
+
+    /* ── FEATURED CASE ── */
+    .featured-case {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      min-height: 40vh;
+    }
+
+    .featured-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-size: 0.55rem;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: rgba(196,210,247,0.5);
+      border: 1px solid rgba(196,210,247,0.18);
+      border-radius: 100px;
+      padding: 0.3rem 0.8rem;
+      width: fit-content;
+      margin-bottom: 1.5rem;
+    }
+
+    /* ── DIVIDER ── */
+    .block-divider {
+      width: 100%;
+      height: 1px;
+      background: rgba(196,210,247,0.09);
+      margin: 0.5rem 0 1.5rem;
+    }
+
+    /* ── MARQUEE ── */
+    .marquee-wrap {
+      overflow: hidden;
+      white-space: nowrap;
+      padding: 1.1rem 0;
+      background: rgba(78,12,40,0.45);
+      backdrop-filter: blur(10px);
+      border-radius: 12px;
+      position: relative;
+      z-index: 2;
+      margin: 0 3rem 1.5rem;
+    }
+
+    .marquee-inner {
+      display: inline-block;
+      animation: marquee 28s linear infinite;
+    }
+
+    .marquee-inner span {
+      font-size: 0.62rem;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: rgba(196,210,247,0.45);
+      padding: 0 0.5rem;
+    }
+
+    .marquee-inner .dot { color: rgba(196,210,247,0.2); }
+
+    @keyframes marquee {
+      0%   { transform: translateX(0); }
+      100% { transform: translateX(-50%); }
+    }
+
+    /* ── CONTACT ROW ── */
+    .contact-list { display: flex; flex-direction: column; margin-top: auto; }
+
+    .contact-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1.1rem 0;
+      border-top: 1px solid rgba(196,210,247,0.09);
+      text-decoration: none;
+      transition: padding-left 0.25s ease;
+    }
+
+    .contact-row:last-child { border-bottom: 1px solid rgba(196,210,247,0.09); }
+    .contact-row:hover { padding-left: 0.75rem; }
+
+    .c-label { font-size: 0.58rem; letter-spacing: 0.3em; text-transform: uppercase; color: rgba(196,210,247,0.28); }
+    .c-value { font-family: 'Cormorant Garamond', serif; font-size: 1.05rem; color: var(--periwinkle); }
+    .c-arrow { font-size: 0.8rem; color: rgba(196,210,247,0.28); }
+
+    .hello-big {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(3rem, 5vw, 5rem);
+      font-weight: 300;
+      color: var(--periwinkle);
+      line-height: 0.95;
+      margin-bottom: 2rem;
+    }
+
+    .hello-sub {
+      font-size: 0.85rem;
+      line-height: 1.8;
+      color: var(--peri-dim);
+      margin-top: 1rem;
+    }
+
+    /* ── FOOTER ── */
+    footer {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 1.5rem;
+      padding: 2.5rem;
+      font-size: 0.62rem;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: rgba(196,210,247,0.2);
+    }
+
+    /* ── CASE DETAIL OVERLAY ── */
+    .case-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 200;
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+      padding: 2rem;
+      background: rgba(5,1,10,0.85);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.35s ease;
+      overflow-y: auto;
+    }
+
+    .case-overlay.open {
+      opacity: 1;
+      pointer-events: all;
+    }
+
+    .case-detail {
+      background: rgba(78,12,40,0.82);
+      border: 1px solid rgba(196,210,247,0.12);
+      border-radius: 20px;
+      max-width: 780px;
+      width: 100%;
+      padding: 3.5rem;
+      margin: auto;
+      position: relative;
+      transform: translateY(30px);
+      transition: transform 0.4s cubic-bezier(0.16,1,0.3,1);
+    }
+
+    .case-overlay.open .case-detail {
+      transform: translateY(0);
+    }
+
+    .detail-close {
+      position: absolute;
+      top: 1.5rem;
+      right: 1.8rem;
+      background: none;
+      border: none;
+      color: rgba(196,210,247,0.45);
+      font-size: 1.3rem;
+      cursor: pointer;
+      transition: color 0.2s;
+      line-height: 1;
+    }
+
+    .detail-close:hover { color: var(--periwinkle); }
+
+    .detail-label {
+      font-size: 0.55rem;
+      letter-spacing: 0.38em;
+      text-transform: uppercase;
+      color: rgba(196,210,247,0.3);
+      margin-bottom: 0.6rem;
+      display: block;
+    }
+
+    .detail-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(2rem, 4vw, 3.2rem);
+      font-weight: 300;
+      line-height: 1.1;
+      color: var(--periwinkle);
+      margin-bottom: 0.5rem;
+    }
+
+    .detail-date {
+      font-size: 0.6rem;
+      letter-spacing: 0.28em;
+      text-transform: uppercase;
+      color: rgba(196,210,247,0.25);
+      margin-bottom: 2.5rem;
+    }
+
+    .detail-divider {
+      width: 100%;
+      height: 1px;
+      background: rgba(196,210,247,0.1);
+      margin: 2rem 0;
+    }
+
+    .detail-body {
+      font-size: 0.92rem;
+      line-height: 1.95;
+      color: var(--peri-dim);
+      font-family: 'Cormorant Garamond', serif;
+      font-weight: 300;
+      font-size: 1.08rem;
+    }
+
+    .detail-body a {
+      color: var(--periwinkle);
+      text-decoration: none;
+      border-bottom: 1px solid rgba(196,210,247,0.35);
+      transition: border-color 0.2s, color 0.2s;
+    }
+
+    .detail-body a:hover {
+      color: #fff;
+      border-bottom-color: var(--periwinkle);
+    }
+
+    .detail-cert-label {
+      font-size: 0.55rem;
+      letter-spacing: 0.38em;
+      text-transform: uppercase;
+      color: rgba(196,210,247,0.25);
+      margin-bottom: 1.2rem;
+      display: block;
+    }
+
+    .detail-cert-img {
+      width: 100%;
+      border-radius: 10px;
+      border: 1px solid rgba(196,210,247,0.1);
+      display: block;
+      opacity: 0.92;
+      transition: opacity 0.2s;
+    }
+
+    .detail-cert-img:hover { opacity: 1; }
+
+    .detail-tags {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+      margin-bottom: 2.2rem;
+    }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 900px) {
+      header { padding: 0 1.5rem; }
+      .grid  { margin: 1.2rem; gap: 10px; }
+      .block { padding: 2rem 1.5rem; }
+      .col-3, .col-4, .col-5, .col-6,
+      .col-7, .col-8, .col-9 { grid-column: span 12; }
+      .marquee-wrap { margin: 0 1.2rem 1rem; }
+      .case-overlay { padding: 1rem; }
+      .case-detail { padding: 2.5rem 1.8rem; }
+    }
+  </style>
+</head>
+<body>
+
+<canvas id="galaxy"></canvas>
+
+<!-- ── CASE DETAIL OVERLAY ── -->
+<div class="case-overlay" id="caseOverlay" role="dialog" aria-modal="true">
+  <div class="case-detail">
+    <button class="detail-close" id="closeOverlay" aria-label="Close">✕</button>
+
+    <span class="detail-label">Case No. 001 · Anatomy · Event</span>
+    <h2 class="detail-title">World Anatomy Day</h2>
+    <p class="detail-date">October 10, 2023 · Department of Anatomy, GMC Omandurar</p>
+
+    <div class="detail-tags">
+      <span class="tag">Anatomy</span>
+      <span class="tag">CME</span>
+    </div>
+
+    <p class="detail-body">
+      Being a part of Anatomy Day was both exciting and eye-opening. The CMEs introduced me to perspectives of anatomy I hadn't encountered before, making learning feel dynamic and meaningful beyond the classroom. I'm truly grateful for the opportunity to have participated. Experiences like this remind me why I chose medicine.
+    </p>
+
+    <div class="detail-divider"></div>
+
+    <span class="detail-cert-label">Certificate of Appreciation</span>
+    <img
+      class="detail-cert-img"
+      src="anat_day.jpeg"
+      alt="Certificate of Appreciation – World Anatomy Day, October 10 2023, Department of Anatomy, Government Medical College Omandurar"
+    />
+  </div>
+</div>
+
+<!-- ── CASE DETAIL OVERLAY · 002 ── -->
+<div class="case-overlay" id="caseOverlay2" role="dialog" aria-modal="true">
+  <div class="case-detail">
+    <button class="detail-close" id="closeOverlay2" aria-label="Close">✕</button>
+
+    <span class="detail-label">Case No. 002 · Anatomy · Quiz</span>
+    <h2 class="detail-title">Galenoquest'24</h2>
+    <p class="detail-date">March 28, 2024 · Department of Anatomy, GMC Omandurar</p>
+
+    <div class="detail-tags">
+      <span class="tag">Anatomy</span>
+      <span class="tag">Quiz</span>
+      <span class="tag">Team Event</span>
+    </div>
+
+    <p class="detail-body">
+      Galenoquest'24 was an intra-batch quiz I participated in as part of a three-member team from my college. We secured fifth place — technically the last — but the experience stayed with me in ways I didn't expect. Being in that room, surrounded by people thinking quickly and critically, pushed me out of my comfort zone and made me more aware of how I approach learning under pressure. It wasn't about the position as much as it was about the shift in perspective it triggered. That day quietly challenged me to be more intentional, more prepared, and more honest with myself about where I stand — and where I want to go.
+    </p>
+
+    <div class="detail-divider"></div>
+
+    <span class="detail-cert-label">Certificate of Excellence</span>
+    <img
+      class="detail-cert-img"
+      src="galenoquest.jpeg"
+      alt="Certificate of Excellence – Galenoquest'24, March 28 2024, Department of Anatomy, Government Medical College Omandurar"
+    />
+  </div>
+</div>
+
+<!-- ── CASE DETAIL OVERLAY · 003 ── -->
+<div class="case-overlay" id="caseOverlay3" role="dialog" aria-modal="true">
+  <div class="case-detail">
+    <button class="detail-close" id="closeOverlay3" aria-label="Close">✕</button>
+
+    <span class="detail-label">Case No. 004 · Cardiology · Workshop</span>
+    <h2 class="detail-title">Empower'25 — The King of Hearts</h2>
+    <p class="detail-date">October 9, 2025 · Government Stanley Medical College &amp; Hospital, Chennai</p>
+
+    <div class="detail-tags">
+      <span class="tag">ACLS</span>
+      <span class="tag">Workshop</span>
+      <span class="tag">Simulation</span>
+      <span class="tag">Emergency Medicine</span>
+    </div>
+
+    <p class="detail-body">
+      An intercollegiate workshop hosted by Stanley Medical College on 9th October 2025, focused on advanced cardiac life support and emergency response. Through hands-on sessions, I learnt the fundamentals of CPR, airway management including intubation and manual ventilation, and developed the ability to interpret cardiac rhythms — identifying arrhythmias and fibrillation patterns in real time. The workshop also included a simulation-based exercise, where we worked with a mannequin to diagnose pathology and deliver appropriate treatment under pressure, blending clinical reasoning with rapid decision-making.
+    </p>
+
+    <div class="detail-divider"></div>
+
+    <span class="detail-cert-label">Certificate of Participation</span>
+    <img
+      class="detail-cert-img"
+      src="IMG_2914_JPG.jpeg"
+      alt="Certificate of Participation – Empower'25, The King of Hearts ACLS Workshop, 9 October 2025, Government Stanley Medical College and Hospital, Chennai"
+    />
+  </div>
+</div>
+
+<!-- ── CASE DETAIL OVERLAY · 004 ── -->
+<div class="case-overlay" id="caseOverlay4" role="dialog" aria-modal="true">
+  <div class="case-detail">
+    <button class="detail-close" id="closeOverlay4" aria-label="Close">✕</button>
+
+    <span class="detail-label">Case No. 003 · Dermatology · Poster &amp; CME</span>
+    <h2 class="detail-title">World Leprosy Day'25</h2>
+    <p class="detail-date">January 30, 2025 · Department of Dermatology, GMC Omandurar</p>
+
+    <div class="detail-tags">
+      <span class="tag">Dermatology</span>
+      <span class="tag">Poster</span>
+      <span class="tag">CME</span>
+      <span class="tag">Reflection</span>
+    </div>
+
+    <p class="detail-body">
+      In my second year, I participated in a poster-making competition for World Leprosy Day, where my work was appreciated for its visual impact and messaging. Alongside this, I attended a CME session that included individuals living with leprosy, offering a perspective that extended far beyond textbooks. Receiving the certificate directly from them made the experience deeply human and unexpectedly moving. It was one of the first moments that made me feel like medicine isn't just about knowledge — it's about connection, empathy, and the possibility of making a tangible difference.
+    </p>
+
+    <div class="detail-divider"></div>
+
+    <span class="detail-cert-label">Poster · Act. Unite. Eliminate.</span>
+    <img
+      class="detail-cert-img"
+      src="world_leprosy_day_poster.jpeg"
+      alt="Poster for World Leprosy Day 2025 – handprints encircling the globe, with themes of breaking barriers, ending stigma, and healing together"
+      style="margin-bottom: 2rem;"
+    />
+
+    <span class="detail-cert-label">Certificate of Participation</span>
+    <img
+      class="detail-cert-img"
+      src="IMG_2908_JPG.jpeg"
+      alt="Certificate of Participation – Poster Presentation, National Anti-Leprosy Day, 30 January 2025, Department of Dermatology, Government Medical College Omandurar"
+    />
+  </div>
+</div>
+
+<!-- ── CASE DETAIL OVERLAY · 005 ── -->
+<div class="case-overlay" id="caseOverlay5" role="dialog" aria-modal="true">
+  <div class="case-detail">
+    <button class="detail-close" id="closeOverlay5" aria-label="Close">✕</button>
+
+    <span class="detail-label">Case No. 005 · Aerospace Medicine · Conference</span>
+    <h2 class="detail-title">ISAM — Aerospace Medicine Conference</h2>
+    <p class="detail-date">November 20–21, 2025 · Institute of Aerospace Medicine, Bengaluru</p>
+
+    <div class="detail-tags">
+      <span class="tag">Aerospace</span>
+      <span class="tag">Conference</span>
+      <span class="tag">Aviation Medicine</span>
+      <span class="tag">Exploration</span>
+    </div>
+
+    <p class="detail-body">
+      I attended a two-day conference by the Indian Society of Aerospace Medicine in Bangalore, where I explored the intersection of medicine with aviation and space — fields that demand a completely different level of precision, adaptability, and understanding of human physiology.
+    </p>
+    <p class="detail-body" style="margin-top: 1.2rem;">
+      Engaging with aviation and Air Force doctors gave me a firsthand look at a life that diverges sharply from conventional medical paths. Meeting figures like Shubhanshu Shukla and Iniya Pragathi further grounded that perspective in reality — showing both the discipline and possibility within this space.
+    </p>
+    <p class="detail-body" style="margin-top: 1.2rem;">
+      More than anything, this experience reinforced something I had been intuitively leaning toward: that my place in medicine might lie beyond the usual boundaries, in environments where exploration and medicine intersect.
+    </p>
+
+    <div class="detail-divider"></div>
+
+    <span class="detail-cert-label">From the conference</span>
+    <img
+      class="detail-cert-img"
+      src="IMG_6076_jpg.jpeg"
+      alt="Photograph from the 64th ISAM Annual Conference, Bengaluru, November 2025"
+      style="margin-bottom: 2rem;"
+    />
+
+    <span class="detail-cert-label">Certificate of Participation</span>
+    <img
+      class="detail-cert-img"
+      src="IMG_2915_JPG.jpeg"
+      alt="Certificate of Participation – 64th Annual Conference, Indian Society of Aerospace Medicine, Institute of Aerospace Medicine, Bengaluru, 20-21 November 2025"
+    />
+  </div>
+</div>
+
+<!-- ── CASE DETAIL OVERLAY · 006 ── -->
+<div class="case-overlay" id="caseOverlay6" role="dialog" aria-modal="true">
+  <div class="case-detail">
+    <button class="detail-close" id="closeOverlay6" aria-label="Close">✕</button>
+
+    <span class="detail-label">Case No. 006 · Dermatology · Slogan Competition</span>
+    <h2 class="detail-title">World Leprosy Day'26 — Slogan Writing</h2>
+    <p class="detail-date">January 30, 2026 · Department of Dermatology, GMC Omandurar</p>
+
+    <div class="detail-tags">
+      <span class="tag">Dermatology</span>
+      <span class="tag">First Place</span>
+      <span class="tag">Slogan</span>
+      <span class="tag">Advocacy</span>
+    </div>
+
+    <p class="detail-body">
+      As part of a World Leprosy Day initiative, I secured first place in a slogan writing competition with <em>"See the art, not the stigma."</em> The idea was deeply personal — I built the visual around a dancer's hand holding a lotus, reworked to resemble a hand affected by leprosy. The intention was to shift the lens: to see what is often marked as damage instead as form, story, and resilience.
+    </p>
+    <p class="detail-body" style="margin-top: 1.2rem;">
+      Presented against that image, the slogan wasn't just a line but a perspective — that the visible marks left by disease don't have to be hidden or reduced to stigma, but can be reclaimed with dignity. In many ways, it drew from the same spirit seen in communities that redefine visible difference on their own terms, turning what was once seen as limitation into expression.
+    </p>
+    <p class="detail-body" style="margin-top: 1.2rem;">
+      Receiving the award from the Dean and later engaging directly with individuals living with leprosy — distributing gifts and interacting beyond the stage — added weight to the moment. Being featured on my college's platform captured the recognition, but what stayed with me was the intent behind it: not just to raise awareness, but to quietly challenge how we choose to see.
+    </p>
+    <p class="detail-body" style="margin-top: 1.2rem;">
+      <a href="https://dermatology.gmcomu.ac.in/2026/01/31/national-anti-leprosy-day-celebration-2026/" target="_blank" rel="noopener noreferrer">Read the college feature →</a>
+    </p>
+
+    <div class="detail-divider"></div>
+
+    <span class="detail-cert-label">Certificate of Achievement · 1st Place</span>
+    <img
+      class="detail-cert-img"
+      src="IMG_2911_JPG.jpeg"
+      alt="Certificate of Achievement – First place in Slogan Competition on World Leprosy Day, 30 January 2026, Department of Dermatology, Government Medical College Omandurar"
+    />
+  </div>
+</div>
+
+<!-- ── CASE DETAIL OVERLAY · 007 ── -->
+<div class="case-overlay" id="caseOverlay7" role="dialog" aria-modal="true">
+  <div class="case-detail">
+    <button class="detail-close" id="closeOverlay7" aria-label="Close">✕</button>
+
+    <span class="detail-label">Case No. 007 · Forensic Medicine · Quiz</span>
+    <h2 class="detail-title">Forensic Decode — Inter-college Quiz</h2>
+    <p class="detail-date">March 25, 2026 · Government Stanley Medical College, Chennai</p>
+
+    <div class="detail-tags">
+      <span class="tag">Forensic Medicine</span>
+      <span class="tag">Quiz</span>
+      <span class="tag">Inter-college</span>
+      <span class="tag">Team Event</span>
+    </div>
+
+    <p class="detail-body">
+      I participated in Forensic Decode, an inter-college forensic medicine quiz hosted by Stanley Medical College, as part of a two-member team. While we didn't make it past the prelims, the experience turned out to be far more valuable than the outcome.
+    </p>
+    <p class="detail-body" style="margin-top: 1.2rem;">
+      Preparing for the quiz introduced me to a different way of engaging with the subject — figuring out how I read, retain, and recall information under pressure, and understanding the level of depth and consistency such competitions demand. It also marked my first exposure to a competitive quiz setting, where the pace, difficulty, and presence of participants across batches made it both challenging and unexpectedly exhilarating.
+    </p>
+    <p class="detail-body" style="margin-top: 1.2rem;">
+      More than anything, it shifted how I approach preparation — not just to know, but to think quickly and apply. It's an experience I would return to without hesitation.
+    </p>
+
+    <div class="detail-divider"></div>
+
+    <span class="detail-cert-label">Certificate of Participation</span>
+    <img
+      class="detail-cert-img"
+      src="IMG_2912_JPG.jpeg"
+      alt="Certificate of Participation – Forensic Decode Inter-College Undergraduate Quiz Competition, 25 March 2026, Department of Forensic Medicine and Toxicology, Government Stanley Medical College, Chennai"
+    />
+  </div>
+</div>
+
+<div class="site">
+
+  <!-- HEADER -->
+  <header>
+    <a class="header-name" href="index.html">
+      <span class="star-glyph">✦</span>
+      <h1>Porpavai</h1>
+    </a>
+    <nav>
+      <a href="index.html">Home</a>
+      <a href="case-files.html" class="active">Case Files</a>
+      <a href="index.html#hello">Hello</a>
+    </nav>
+  </header>
+
+  <!-- PAGE HERO -->
+  <section id="top">
+    <div class="grid">
+
+      <!-- BLOCK 1 · page title -->
+      <div class="block block-blue col-7 page-hero">
+        <div>
+          <span class="block-label">Medicine · Observations · Notes</span>
+          <h1 class="page-title">
+            Case<br /><em>Files</em>
+          </h1>
+          <p class="page-subtitle">
+            A record of what I chose to pursue.
+          </p>
+        </div>
+      </div>
+
+      <!-- BLOCK 2 · stats -->
+      <div class="block block-wine col-5 stat-block">
+        <div class="stat-item">
+          <span class="stat-number">07</span>
+          <span class="stat-label">Cases documented</span>
+        </div>
+        <div class="block-divider"></div>
+        <div class="stat-item">
+          <span class="stat-number">7</span>
+          <span class="stat-label">Events attended</span>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- FEATURED CASE — Forensic Decode -->
+  <section>
+    <div class="grid">
+
+      <button
+        onclick="document.getElementById('caseOverlay7').classList.add('open')"
+        class="block block-wine col-12 featured-case case-card"
+        style="border:none; text-align:left; width:100%;"
+      >
+        <div class="case-top">
+          <span class="featured-badge">✦ &nbsp; Featured case</span>
+          <span class="case-number">Case No. 007</span>
+          <h2 class="case-title">Forensic Decode — Inter-college Quiz</h2>
+          <p class="case-desc">
+            March 25, 2026 · Government Stanley Medical College, Chennai — a two-member team, an early exit at the prelims, and a shift in how I approach preparation. Not just to know, but to think quickly and apply. Click to read more.
+          </p>
+        </div>
+        <div class="case-bottom">
+          <div class="case-tags">
+            <span class="tag">Forensic Medicine</span>
+            <span class="tag">Quiz</span>
+            <span class="tag">Inter-college</span>
+            <span class="tag">Team Event</span>
+          </div>
+          <span class="case-arrow">↗</span>
+        </div>
+      </button>
+
+    </div>
+  </section>
+
+  <!-- CASE 006 — World Leprosy Day'26 Slogan -->
+  <section>
+    <div class="grid">
+
+      <button
+        onclick="document.getElementById('caseOverlay6').classList.add('open')"
+        class="block block-blue col-12 featured-case case-card"
+        style="border:none; text-align:left; width:100%;"
+      >
+        <div class="case-top">
+          <span class="case-number">Case No. 006</span>
+          <h2 class="case-title">World Leprosy Day'26 — Slogan Writing</h2>
+          <p class="case-desc">
+            January 30, 2026 · Department of Dermatology, GMC Omandurar — first place for <em>"See the art, not the stigma."</em> A quiet challenge to how we choose to see. Click to read more.
+          </p>
+        </div>
+        <div class="case-bottom">
+          <div class="case-tags">
+            <span class="tag">Dermatology</span>
+            <span class="tag">First Place</span>
+            <span class="tag">Slogan</span>
+            <span class="tag">Advocacy</span>
+          </div>
+          <span class="case-arrow">↗</span>
+        </div>
+      </button>
+
+    </div>
+  </section>
+
+  <!-- CASE 005 — ISAM Aerospace Medicine Conference -->
+  <section>
+    <div class="grid">
+
+      <button
+        onclick="document.getElementById('caseOverlay5').classList.add('open')"
+        class="block block-wine col-12 featured-case case-card"
+        style="border:none; text-align:left; width:100%;"
+      >
+        <div class="case-top">
+          <span class="case-number">Case No. 005</span>
+          <h2 class="case-title">ISAM — Aerospace Medicine Conference</h2>
+          <p class="case-desc">
+            November 20–21, 2025 · Institute of Aerospace Medicine, Bengaluru — two days at the intersection of medicine, aviation and space. A reminder that my place in medicine might lie beyond the usual boundaries. Click to read more.
+          </p>
+        </div>
+        <div class="case-bottom">
+          <div class="case-tags">
+            <span class="tag">Aerospace</span>
+            <span class="tag">Conference</span>
+            <span class="tag">Aviation Medicine</span>
+            <span class="tag">Exploration</span>
+          </div>
+          <span class="case-arrow">↗</span>
+        </div>
+      </button>
+
+    </div>
+  </section>
+
+  <!-- CASE 004 — Empower'25 -->
+  <section>
+    <div class="grid">
+
+      <button
+        onclick="document.getElementById('caseOverlay3').classList.add('open')"
+        class="block block-blue col-12 featured-case case-card"
+        style="border:none; text-align:left; width:100%;"
+      >
+        <div class="case-top">
+          <span class="case-number">Case No. 004</span>
+          <h2 class="case-title">Empower'25 — The King of Hearts</h2>
+          <p class="case-desc">
+            October 9, 2025 · Government Stanley Medical College, Chennai — an ACLS workshop on CPR, airway management, and real-time rhythm interpretation, ending in a high-pressure mannequin simulation. Click to read more.
+          </p>
+        </div>
+        <div class="case-bottom">
+          <div class="case-tags">
+            <span class="tag">ACLS</span>
+            <span class="tag">Workshop</span>
+            <span class="tag">Simulation</span>
+            <span class="tag">Emergency Medicine</span>
+          </div>
+          <span class="case-arrow">↗</span>
+        </div>
+      </button>
+
+    </div>
+  </section>
+
+  <!-- CASE 003 — World Leprosy Day'25 -->
+  <section>
+    <div class="grid">
+
+      <button
+        onclick="document.getElementById('caseOverlay4').classList.add('open')"
+        class="block block-wine col-12 featured-case case-card"
+        style="border:none; text-align:left; width:100%;"
+      >
+        <div class="case-top">
+          <span class="case-number">Case No. 003</span>
+          <h2 class="case-title">World Leprosy Day'25</h2>
+          <p class="case-desc">
+            January 30, 2025 · Department of Dermatology, GMC Omandurar — a poster presentation and a CME shared with people living with leprosy. One of the first moments medicine felt like connection, not just knowledge. Click to read more.
+          </p>
+        </div>
+        <div class="case-bottom">
+          <div class="case-tags">
+            <span class="tag">Dermatology</span>
+            <span class="tag">Poster</span>
+            <span class="tag">CME</span>
+            <span class="tag">Reflection</span>
+          </div>
+          <span class="case-arrow">↗</span>
+        </div>
+      </button>
+
+    </div>
+  </section>
+
+  <!-- CASE 002 — Galenoquest'24 -->
+  <section>
+    <div class="grid">
+
+      <button
+        onclick="document.getElementById('caseOverlay2').classList.add('open')"
+        class="block block-blue col-12 featured-case case-card"
+        style="border:none; text-align:left; width:100%;"
+      >
+        <div class="case-top">
+          <span class="case-number">Case No. 002</span>
+          <h2 class="case-title">Galenoquest'24</h2>
+          <p class="case-desc">
+            March 28, 2024 · Department of Anatomy, GMC Omandurar — an intra-batch anatomy quiz. Fifth place, three-member team, and a quiet shift in perspective. Click to read more.
+          </p>
+        </div>
+        <div class="case-bottom">
+          <div class="case-tags">
+            <span class="tag">Anatomy</span>
+            <span class="tag">Quiz</span>
+            <span class="tag">Team Event</span>
+          </div>
+          <span class="case-arrow">↗</span>
+        </div>
+      </button>
+
+    </div>
+  </section>
+
+  <!-- CASE 001 — World Anatomy Day -->
+  <section>
+    <div class="grid">
+
+      <button
+        onclick="document.getElementById('caseOverlay').classList.add('open')"
+        class="block block-wine col-12 featured-case case-card"
+        style="border:none; text-align:left; width:100%;"
+      >
+        <div class="case-top">
+          <span class="case-number">Case No. 001</span>
+          <h2 class="case-title">World Anatomy Day</h2>
+          <p class="case-desc">
+            October 10, 2023 · Department of Anatomy, GMC Omandurar — a day of action and awareness under the theme <em>"teaching diversity in the dissection laboratory."</em> Click to read more.
+          </p>
+        </div>
+        <div class="case-bottom">
+          <div class="case-tags">
+            <span class="tag">Anatomy</span>
+            <span class="tag">CME</span>
+          </div>
+          <span class="case-arrow">↗</span>
+        </div>
+      </button>
+
+    </div>
+  </section>
+
+  <!-- MARQUEE -->
+  <div class="marquee-wrap">
+    <div class="marquee-inner">
+      <span>Medicine</span><span class="dot">·</span>
+      <span>Clinical Cases</span><span class="dot">·</span>
+      <span>Porpavai V Kannan</span><span class="dot">·</span>
+      <span>Omandurar Medical College</span><span class="dot">·</span>
+      <span>Observations</span><span class="dot">·</span>
+      <span>Curiosity</span><span class="dot">·</span>
+      <span>MBBS Year 1</span><span class="dot">·</span>
+      <span>Chennai</span><span class="dot">·</span>
+      <span>Medicine</span><span class="dot">·</span>
+      <span>Clinical Cases</span><span class="dot">·</span>
+      <span>Porpavai V Kannan</span><span class="dot">·</span>
+      <span>Omandurar Medical College</span><span class="dot">·</span>
+      <span>Observations</span><span class="dot">·</span>
+      <span>Curiosity</span><span class="dot">·</span>
+      <span>MBBS Year 1</span><span class="dot">·</span>
+      <span>Chennai</span><span class="dot">·</span>
+    </div>
+  </div>
+
+  <!-- HELLO / CONTACT -->
+  <section id="hello">
+    <div class="grid">
+
+      <div class="block block-blue col-6">
+        <span class="block-label">Always open to a conversation</span>
+        <h2 class="hello-big">Let's<br />say<br />hello.</h2>
+        <p class="hello-sub">Whether it's about medicine, tech, dance, books, or the perfect coffee-to-milk ratio — I'm all ears.</p>
+      </div>
+
+      <div class="block block-wine col-6">
+        <span class="block-label" style="margin-bottom:2rem;">Links</span>
+        <div class="contact-list">
+          <a href="mailto:porpavai@example.com" class="contact-row">
+            <span class="c-label">Email</span>
+            <span class="c-value">porpavai@example.com</span>
+            <span class="c-arrow">→</span>
+          </a>
+          <a href="#" class="contact-row">
+            <span class="c-label">LinkedIn</span>
+            <span class="c-value">in/porpavai</span>
+            <span class="c-arrow">→</span>
+          </a>
+          <a href="#" class="contact-row">
+            <span class="c-label">Instagram</span>
+            <span class="c-value">@porpavai</span>
+            <span class="c-arrow">→</span>
+          </a>
+          <a href="#" class="contact-row">
+            <span class="c-label">Resume</span>
+            <span class="c-value">Download PDF</span>
+            <span class="c-arrow">↓</span>
+          </a>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <p>© 2025 Porpavai V Kannan</p>
+  </footer>
+
+</div>
+
+<!-- ── GALAXY SCRIPT ── -->
+<script>
+(function () {
+  const canvas = document.getElementById('galaxy');
+  const ctx    = canvas.getContext('2d');
+
+  let W, H, stars = [], nebulae = [], shoots = [];
+
+  const STAR_COUNT   = 440;
+  const NEBULA_COUNT = 7;
+
+  function resize() {
+    W = canvas.width  = window.innerWidth;
+    H = canvas.height = window.innerHeight;
+  }
+
+  function makeStar(scatter) {
+    const x    = scatter ? Math.random() * W : W + 8;
+    const y    = Math.random() * H;
+    const size = Math.random() < 0.06
+                   ? 2 + Math.random() * 1.6
+                   : 0.35 + Math.random() * 1.3;
+    const speed  = 18 + Math.random() * 38;
+    const twinkT = 2200 + Math.random() * 5000;
+    const twinkO = Math.random() * Math.PI * 2;
+    const palettes = [
+      'rgba(196,210,247,',
+      'rgba(215,225,255,',
+      'rgba(180,160,220,',
+      'rgba(240,235,255,',
+      'rgba(210,175,210,',
+    ];
+    const col = palettes[Math.floor(Math.random() * palettes.length)];
+    return { x, y, size, speed, twinkT, twinkO, col };
+  }
+
+  function makeNebula(scatter) {
+    const x = scatter ? Math.random() * W * 1.5 : W + 350;
+    const y = Math.random() * H;
+    const r = 180 + Math.random() * 280;
+    const speed = 4 + Math.random() * 9;
+    const wine  = Math.random() < 0.45;
+    const hue   = wine
+                    ? { r: 78, g: 12, b: 40 }
+                    : { r: 55, g: 35, b: 115 };
+    const alpha = 0.04 + Math.random() * 0.07;
+    return { x, y, r, speed, hue, alpha };
+  }
+
+  function init() {
+    resize();
+    stars   = Array.from({ length: STAR_COUNT   }, () => makeStar(true));
+    nebulae = Array.from({ length: NEBULA_COUNT }, () => makeNebula(true));
+  }
+
+  function spawnShoot() {
+    const maxLife = 0.55 + Math.random() * 0.45;
+    shoots.push({
+      x: Math.random() * W,
+      y: Math.random() * H * 0.55,
+      vx: -(180 + Math.random() * 260),
+      vy:   55 + Math.random() * 110,
+      life: maxLife,
+      maxLife,
+    });
+  }
+
+  function draw(dt, elapsed) {
+    ctx.clearRect(0, 0, W, H);
+
+    const bg = ctx.createRadialGradient(W*0.5, H*0.42, 0, W*0.5, H*0.42, Math.max(W,H)*0.95);
+    bg.addColorStop(0,   'rgba(10,3,22,1)');
+    bg.addColorStop(0.5, 'rgba(6,2,16,1)');
+    bg.addColorStop(1,   'rgba(2,0,8,1)');
+    ctx.fillStyle = bg;
+    ctx.fillRect(0, 0, W, H);
+
+    for (let n of nebulae) {
+      n.x -= n.speed * dt;
+      if (n.x + n.r < 0) Object.assign(n, makeNebula(false));
+      const g = ctx.createRadialGradient(n.x, n.y, 0, n.x, n.y, n.r);
+      g.addColorStop(0,   `rgba(${n.hue.r},${n.hue.g},${n.hue.b},${n.alpha})`);
+      g.addColorStop(0.55,`rgba(${n.hue.r},${n.hue.g},${n.hue.b},${(n.alpha*0.4).toFixed(3)})`);
+      g.addColorStop(1,   `rgba(${n.hue.r},${n.hue.g},${n.hue.b},0)`);
+      ctx.fillStyle = g;
+      ctx.beginPath();
+      ctx.arc(n.x, n.y, n.r, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    for (let s of stars) {
+      s.x -= s.speed * dt;
+      if (s.x + s.size < 0) { Object.assign(s, makeStar(false)); s.x = W + s.size; }
+      const tw = 0.5 + 0.5 * Math.sin((elapsed / s.twinkT) * Math.PI * 2 + s.twinkO);
+      const a  = 0.28 + 0.72 * tw;
+      if (s.size > 1.6) {
+        const gw = ctx.createRadialGradient(s.x, s.y, 0, s.x, s.y, s.size * 4.5);
+        gw.addColorStop(0, `${s.col}${(a * 0.55).toFixed(2)})`);
+        gw.addColorStop(1, `${s.col}0)`);
+        ctx.fillStyle = gw;
+        ctx.beginPath();
+        ctx.arc(s.x, s.y, s.size * 4.5, 0, Math.PI * 2);
+        ctx.fill();
+      }
+      ctx.fillStyle = `${s.col}${a.toFixed(2)})`;
+      ctx.beginPath();
+      ctx.arc(s.x, s.y, s.size, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    if (Math.random() < 0.0018) spawnShoot();
+    for (let i = shoots.length - 1; i >= 0; i--) {
+      const sh = shoots[i];
+      sh.life -= dt;
+      if (sh.life <= 0) { shoots.splice(i, 1); continue; }
+      const prog = 1 - sh.life / sh.maxLife;
+      const fade = sh.life / sh.maxLife;
+      const cx   = sh.x + sh.vx * prog * sh.maxLife;
+      const cy   = sh.y + sh.vy * prog * sh.maxLife;
+      const tx   = cx - sh.vx * 0.16;
+      const ty   = cy - sh.vy * 0.16;
+      const sg   = ctx.createLinearGradient(tx, ty, cx, cy);
+      sg.addColorStop(0, `rgba(196,210,247,0)`);
+      sg.addColorStop(1, `rgba(196,210,247,${fade.toFixed(2)})`);
+      ctx.strokeStyle = sg;
+      ctx.lineWidth   = 1.4;
+      ctx.beginPath();
+      ctx.moveTo(tx, ty);
+      ctx.lineTo(cx, cy);
+      ctx.stroke();
+    }
+  }
+
+  let last = null;
+  let elapsed = 0;
+  function loop(ts) {
+    if (!last) last = ts;
+    const dt = Math.min((ts - last) / 1000, 0.05);
+    elapsed += dt * 1000;
+    last = ts;
+    draw(dt, elapsed);
+    requestAnimationFrame(loop);
+  }
+
+  window.addEventListener('resize', resize);
+  init();
+  requestAnimationFrame(loop);
+})();
+
+/* ── OVERLAY CLOSE ── */
+(function () {
+  const overlays = [
+    { overlay: document.getElementById('caseOverlay'),  closeBtn: document.getElementById('closeOverlay')  },
+    { overlay: document.getElementById('caseOverlay2'), closeBtn: document.getElementById('closeOverlay2') },
+    { overlay: document.getElementById('caseOverlay3'), closeBtn: document.getElementById('closeOverlay3') },
+    { overlay: document.getElementById('caseOverlay4'), closeBtn: document.getElementById('closeOverlay4') },
+    { overlay: document.getElementById('caseOverlay5'), closeBtn: document.getElementById('closeOverlay5') },
+    { overlay: document.getElementById('caseOverlay6'), closeBtn: document.getElementById('closeOverlay6') },
+    { overlay: document.getElementById('caseOverlay7'), closeBtn: document.getElementById('closeOverlay7') },
+  ];
+
+  overlays.forEach(({ overlay, closeBtn }) => {
+    if (!overlay || !closeBtn) return;
+
+    closeBtn.addEventListener('click', () => overlay.classList.remove('open'));
+
+    overlay.addEventListener('click', (e) => {
+      if (e.target === overlay) overlay.classList.remove('open');
+    });
+  });
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      overlays.forEach(({ overlay }) => overlay && overlay.classList.remove('open'));
+    }
+  });
+})();
+</script>
+</body>
+</html>
