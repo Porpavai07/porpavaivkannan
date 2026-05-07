@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Hello · Porpavai</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300&family=Archivo:wght@300;400&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --wine:       #4E0C28;
+      --periwinkle: #C4D2F7;
+      --peri-dim:   rgba(196,210,247,0.55);
+      --peri-faint: rgba(196,210,247,0.12);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: #05010a;
+      color: var(--periwinkle);
+      font-family: 'Archivo', sans-serif;
+      font-weight: 300;
+      overflow-x: hidden;
+    }
+
+    /* ── GALAXY ── */
+    #galaxy {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    .site { position: relative; z-index: 1; }
+
+    /* ── HEADER ── */
+    header {
+      background: var(--wine);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      display: flex;
+      align-items: stretch;
+      justify-content: space-between;
+      padding: 0 4rem;
+      border-bottom: 1px solid rgba(196,210,247,0.1);
+    }
+
+    .header-name {
+      display: flex;
+      align-items: center;
+      gap: 0.7rem;
+      padding: 1.3rem 0;
+      text-decoration: none;
+    }
+
+    .header-name h1 {
+      font-family: 'Cormorant Garamond', serif;
+      font-weight: 300;
+      font-size: 1.5rem;
+      color: var(--periwinkle);
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+    }
+
+    .star-glyph { opacity: 0.45; font-size: 0.9rem; color: var(--periwinkle); }
+
+    nav { display: flex; align-items: center; }
+
+    nav a {
+      color: var(--periwinkle);
+      text-decoration: none;
+      font-size: 0.68rem;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      font-weight: 400;
+      padding: 0 1.6rem;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      border-left: 1px solid rgba(196,210,247,0.1);
+      position: relative;
+      transition: color 0.2s;
+    }
+
+    nav a::after {
+      content: '';
+      position: absolute;
+      bottom: 0; left: 0;
+      width: 0; height: 2px;
+      background: var(--periwinkle);
+      transition: width 0.3s ease;
+    }
+
+    nav a:hover::after, nav a.active::after { width: 100%; }
+    nav a:hover, nav a.active { color: #fff; }
+
+    /* ── PAGE LAYOUT ── */
+    .page-wrap {
+      min-height: calc(100vh - 60px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 5rem 2rem;
+    }
+
+    .hello-layout {
+      display: grid;
+      grid-template-columns: 1fr 1.2fr;
+      gap: 0;
+      width: 100%;
+      max-width: 860px;
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow: 0 12px 64px rgba(0,0,0,0.6);
+    }
+
+    /* LEFT PANEL — wine */
+    .hello-left {
+      background: rgba(78,12,40,0.82);
+      backdrop-filter: blur(20px) saturate(1.4);
+      -webkit-backdrop-filter: blur(20px) saturate(1.4);
+      padding: 3.5rem 2.8rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .hello-left .tag {
+      font-size: 0.58rem;
+      letter-spacing: 0.35em;
+      text-transform: uppercase;
+      color: var(--peri-dim);
+    }
+
+    .hello-left h2 {
+      font-family: 'Cormorant Garamond', serif;
+      font-weight: 300;
+      font-size: clamp(2.8rem, 5vw, 4rem);
+      line-height: 1.05;
+      color: var(--periwinkle);
+      margin: 2rem 0 1.5rem;
+    }
+
+    .hello-left h2 em {
+      font-style: italic;
+      color: var(--peri-dim);
+    }
+
+    .hello-left p {
+      font-size: 0.8rem;
+      line-height: 1.75;
+      color: var(--peri-dim);
+      max-width: 22ch;
+    }
+
+    .divider {
+      width: 32px;
+      height: 1px;
+      background: var(--peri-dim);
+      margin: 2.5rem 0;
+      opacity: 0.4;
+    }
+
+    .quick-links { display: flex; flex-direction: column; gap: 0.6rem; }
+
+    .quick-links a {
+      font-size: 0.65rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--peri-dim);
+      text-decoration: none;
+      transition: color 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .quick-links a:hover { color: var(--periwinkle); }
+    .quick-links a span { opacity: 0.45; }
+
+    /* RIGHT PANEL — dark glass */
+    .hello-right {
+      background: rgba(196,210,247,0.06);
+      backdrop-filter: blur(24px) saturate(1.3);
+      -webkit-backdrop-filter: blur(24px) saturate(1.3);
+      padding: 3.5rem 2.8rem;
+      border-left: 1px solid rgba(196,210,247,0.08);
+    }
+
+    .hello-right .tag {
+      font-size: 0.58rem;
+      letter-spacing: 0.35em;
+      text-transform: uppercase;
+      color: rgba(196,210,247,0.3);
+      margin-bottom: 2rem;
+      display: block;
+    }
+
+    .field-group { display: flex; flex-direction: column; gap: 1.4rem; }
+
+    .field { display: flex; flex-direction: column; gap: 0.4rem; }
+
+    .field label {
+      font-size: 0.62rem;
+      letter-spacing: 0.22em;
+      text-transform: lowercase;
+      color: rgba(196,210,247,0.45);
+    }
+
+    .field label i { color: var(--wine); margin-left: 2px; font-style: normal; }
+
+    .field input,
+    .field textarea {
+      background: rgba(196,210,247,0.07);
+      border: 1px solid rgba(196,210,247,0.12);
+      border-radius: 10px;
+      padding: 0.75rem 1rem;
+      font-family: 'Archivo', sans-serif;
+      font-size: 0.85rem;
+      font-weight: 300;
+      color: var(--periwinkle);
+      outline: none;
+      transition: border-color 0.2s, background 0.2s;
+      width: 100%;
+    }
+
+    .field input::placeholder,
+    .field textarea::placeholder {
+      color: rgba(196,210,247,0.18);
+    }
+
+    .field input:focus,
+    .field textarea:focus {
+      border-color: rgba(196,210,247,0.35);
+      background: rgba(196,210,247,0.11);
+    }
+
+    .field textarea {
+      resize: vertical;
+      min-height: 110px;
+    }
+
+    .submit-btn {
+      margin-top: 0.8rem;
+      width: 100%;
+      background: var(--wine);
+      color: var(--periwinkle);
+      border: 1px solid rgba(196,210,247,0.15);
+      border-radius: 10px;
+      padding: 0.9rem 1rem;
+      font-family: 'Archivo', sans-serif;
+      font-size: 0.7rem;
+      letter-spacing: 0.28em;
+      text-transform: lowercase;
+      cursor: pointer;
+      transition: background 0.2s, border-color 0.2s, transform 0.15s;
+    }
+
+    .submit-btn:hover {
+      background: #6b1038;
+      border-color: rgba(196,210,247,0.3);
+      transform: translateY(-1px);
+    }
+
+    .submit-btn:active { transform: translateY(0); }
+
+    /* success */
+    .success-msg {
+      display: none;
+      text-align: center;
+      padding: 3rem 0;
+    }
+
+    .success-glyph {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 3.5rem;
+      color: var(--peri-dim);
+      margin-bottom: 1rem;
+      display: block;
+    }
+
+    .success-msg p {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.5rem;
+      font-weight: 300;
+      color: var(--periwinkle);
+      line-height: 1.5;
+    }
+
+    .success-msg .sub {
+      font-family: 'Archivo', sans-serif;
+      font-size: 0.65rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--peri-dim);
+      margin-top: 0.8rem;
+      display: block;
+      font-weight: 300;
+    }
+
+    footer {
+      text-align: center;
+      padding: 2rem;
+      font-size: 0.6rem;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: rgba(196,210,247,0.15);
+    }
+
+    @media (max-width: 640px) {
+      .hello-layout { grid-template-columns: 1fr; }
+      .hello-left { padding: 2.5rem 2rem; }
+      .hello-right { padding: 2.5rem 2rem; border-left: none; border-top: 1px solid rgba(196,210,247,0.08); }
+      header { padding: 0 1.5rem; }
+    }
+  </style>
+</head>
+<body>
+
+<canvas id="galaxy"></canvas>
+
+<div class="site">
+
+  <header>
+    <a href="index.html" class="header-name">
+      <span class="star-glyph">✦</span>
+      <h1>Porpavai</h1>
+    </a>
+    <nav>
+      <a href="index.html">home</a>
+      <a href="case-files.html">case files</a>
+      <a href="hello.html" class="active">hello</a>
+    </nav>
+  </header>
+
+  <div class="page-wrap">
+    <div class="hello-layout">
+
+      <!-- LEFT -->
+      <div class="hello-left">
+        <div>
+          <span class="tag">✦ &nbsp; get in touch</span>
+          <h2>Let's<br /><em>say</em><br />hello.</h2>
+          <p>Whether it's about medicine, AI, dance, books — or just something on your mind.</p>
+        </div>
+        <div>
+          <div class="divider"></div>
+          <div class="quick-links">
+            <a href="mailto:porpavai@example.com"><span>✉</span> porpavai@example.com</a>
+            <a href="#"><span>in</span> linkedin</a>
+            <a href="#"><span>@</span> instagram</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- RIGHT -->
+      <div class="hello-right">
+        <span class="tag">drop me a note</span>
+
+        <div id="formArea">
+          <div class="field-group">
+            <div class="field">
+              <label for="f-name">name <i>*</i></label>
+              <input type="text" id="f-name" placeholder="your name" />
+            </div>
+            <div class="field">
+              <label for="f-email">email <i>*</i></label>
+              <input type="email" id="f-email" placeholder="your@email.com" />
+            </div>
+            <div class="field">
+              <label for="f-subject">subject</label>
+              <input type="text" id="f-subject" placeholder="what's this about?" />
+            </div>
+            <div class="field">
+              <label for="f-message">message <i>*</i></label>
+              <textarea id="f-message" placeholder="tell me anything..."></textarea>
+            </div>
+          </div>
+          <button class="submit-btn" onclick="handleSubmit()">say hello</button>
+        </div>
+
+        <div class="success-msg" id="successMsg">
+          <span class="success-glyph">✦</span>
+          <p>message received.<br />i'll be in touch soon.</p>
+          <span class="sub">thank you for reaching out</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <footer>© 2025 Porpavai V Kannan</footer>
+</div>
+
+<script>
+(function () {
+  const canvas = document.getElementById('galaxy');
+  const ctx = canvas.getContext('2d');
+  let W, H, stars = [], nebulae = [], shoots = [];
+  const STAR_COUNT = 440, NEBULA_COUNT = 7;
+
+  function resize() { W = canvas.width = window.innerWidth; H = canvas.height = window.innerHeight; }
+
+  function makeStar(scatter) {
+    const x = scatter ? Math.random() * W : W + 8;
+    const y = Math.random() * H;
+    const size = Math.random() < 0.06 ? 2 + Math.random() * 1.6 : 0.35 + Math.random() * 1.3;
+    const speed = 18 + Math.random() * 38;
+    const twinkT = 2200 + Math.random() * 5000;
+    const twinkO = Math.random() * Math.PI * 2;
+    const palettes = ['rgba(196,210,247,','rgba(215,225,255,','rgba(180,160,220,','rgba(240,235,255,','rgba(210,175,210,'];
+    return { x, y, size, speed, twinkT, twinkO, col: palettes[Math.floor(Math.random() * palettes.length)] };
+  }
+
+  function makeNebula(scatter) {
+    const x = scatter ? Math.random() * W * 1.5 : W + 350;
+    const y = Math.random() * H;
+    const r = 180 + Math.random() * 280;
+    const speed = 4 + Math.random() * 9;
+    const wine = Math.random() < 0.45;
+    const hue = wine ? { r:78,g:12,b:40 } : { r:55,g:35,b:115 };
+    return { x, y, r, speed, hue, alpha: 0.04 + Math.random() * 0.07 };
+  }
+
+  function init() {
+    resize();
+    stars = Array.from({ length: STAR_COUNT }, () => makeStar(true));
+    nebulae = Array.from({ length: NEBULA_COUNT }, () => makeNebula(true));
+  }
+
+  function spawnShoot() {
+    const maxLife = 0.55 + Math.random() * 0.45;
+    shoots.push({ x: Math.random()*W, y: Math.random()*H*0.55, vx: -(180+Math.random()*260), vy: 55+Math.random()*110, life: maxLife, maxLife });
+  }
+
+  function draw(dt, elapsed) {
+    ctx.clearRect(0,0,W,H);
+    const bg = ctx.createRadialGradient(W*.5,H*.42,0,W*.5,H*.42,Math.max(W,H)*.95);
+    bg.addColorStop(0,'rgba(10,3,22,1)'); bg.addColorStop(.5,'rgba(6,2,16,1)'); bg.addColorStop(1,'rgba(2,0,8,1)');
+    ctx.fillStyle = bg; ctx.fillRect(0,0,W,H);
+
+    for (const n of nebulae) {
+      n.x -= n.speed * dt;
+      if (n.x + n.r < 0) Object.assign(n, makeNebula(false));
+      const g = ctx.createRadialGradient(n.x,n.y,0,n.x,n.y,n.r);
+      g.addColorStop(0, `rgba(${n.hue.r},${n.hue.g},${n.hue.b},${n.alpha})`);
+      g.addColorStop(.55, `rgba(${n.hue.r},${n.hue.g},${n.hue.b},${(n.alpha*.4).toFixed(3)})`);
+      g.addColorStop(1, `rgba(${n.hue.r},${n.hue.g},${n.hue.b},0)`);
+      ctx.fillStyle = g; ctx.beginPath(); ctx.arc(n.x,n.y,n.r,0,Math.PI*2); ctx.fill();
+    }
+
+    for (const s of stars) {
+      s.x -= s.speed * dt;
+      if (s.x + s.size < 0) { Object.assign(s, makeStar(false)); s.x = W + s.size; }
+      const tw = .5 + .5 * Math.sin((elapsed / s.twinkT) * Math.PI * 2 + s.twinkO);
+      const a = .28 + .72 * tw;
+      if (s.size > 1.6) {
+        const gw = ctx.createRadialGradient(s.x,s.y,0,s.x,s.y,s.size*4.5);
+        gw.addColorStop(0, `${s.col}${(a*.55).toFixed(2)})`); gw.addColorStop(1, `${s.col}0)`);
+        ctx.fillStyle = gw; ctx.beginPath(); ctx.arc(s.x,s.y,s.size*4.5,0,Math.PI*2); ctx.fill();
+      }
+      ctx.fillStyle = `${s.col}${a.toFixed(2)})`; ctx.beginPath(); ctx.arc(s.x,s.y,s.size,0,Math.PI*2); ctx.fill();
+    }
+
+    if (Math.random() < .0018) spawnShoot();
+    for (let i = shoots.length - 1; i >= 0; i--) {
+      const sh = shoots[i]; sh.life -= dt;
+      if (sh.life <= 0) { shoots.splice(i,1); continue; }
+      const prog = 1 - sh.life / sh.maxLife, fade = sh.life / sh.maxLife;
+      const cx = sh.x + sh.vx*prog*sh.maxLife, cy = sh.y + sh.vy*prog*sh.maxLife;
+      const tx = cx - sh.vx*.16, ty = cy - sh.vy*.16;
+      const sg = ctx.createLinearGradient(tx,ty,cx,cy);
+      sg.addColorStop(0, `rgba(196,210,247,0)`); sg.addColorStop(1, `rgba(196,210,247,${fade.toFixed(2)})`);
+      ctx.strokeStyle = sg; ctx.lineWidth = 1.4; ctx.beginPath(); ctx.moveTo(tx,ty); ctx.lineTo(cx,cy); ctx.stroke();
+    }
+  }
+
+  let last = null, elapsed = 0;
+  function loop(ts) {
+    if (!last) last = ts;
+    const dt = Math.min((ts - last) / 1000, .05); elapsed += dt * 1000; last = ts;
+    draw(dt, elapsed); requestAnimationFrame(loop);
+  }
+
+  window.addEventListener('resize', resize);
+  init();
+  requestAnimationFrame(loop);
+})();
+
+function handleSubmit() {
+  const name    = document.getElementById('f-name').value.trim();
+  const email   = document.getElementById('f-email').value.trim();
+  const message = document.getElementById('f-message').value.trim();
+  if (!name || !email || !message) {
+    const missing = [!name&&'name', !email&&'email', !message&&'message'].filter(Boolean);
+    alert('please fill in: ' + missing.join(', '));
+    return;
+  }
+  document.getElementById('formArea').style.display = 'none';
+  document.getElementById('successMsg').style.display = 'block';
+}
+</script>
+</body>
+</html>
